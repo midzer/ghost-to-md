@@ -1,2 +1,3 @@
 *.json
+ghost-to-md-output
 node_modules

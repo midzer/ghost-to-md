@@ -6,12 +6,12 @@ var _ = require('lodash');
 var argv = require('yargs');
 
 argv = argv
-  .usage('Migrate your Ghost database to markdown files.')
-  .example('$0 ghost-export.json', 'Migrates export file.')
+  .usage('Migrate your webhook database to markdown files.')
+  .example('$0 webhook-export.json', 'Migrates export file.')
   .options('o', {
     describe: 'Output directory.',
     alias: 'output',
-    default: 'ghost-to-md-output'
+    default: 'webhook-to-md-output'
   })
   .options('t', {
     describe: 'Template file.',

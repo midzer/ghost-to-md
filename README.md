@@ -1,19 +1,19 @@
-# ghost-to-md
+# webhook-to-md
 
-A tool to export your [Ghost](https://github.com/TryGhost/Ghost) export file to a collection of markdown files.
+A tool to export your [webhook](https://github.com/Trywebhook/webhook) export file to a collection of markdown files.
 
 
 # Usage
 
-1. Export your Ghost blog through the export screen: http://ghost.domain.com/ghost/debug/
+1. Export your webhook blog through the export screen: http://webhook.domain.com/webhook/debug/
 
 1. Install this module globally so it can be used from the CLI.
 
-  `npm install -g ghost-to-md`
+  `npm install -g webhook-to-md`
 
 1. Run the program, pointing it to your export file.
 
-  `ghost-to-md ghost-export-file.json`
+  `webhook-to-md webhook-export-file.json`
 
 
 # License

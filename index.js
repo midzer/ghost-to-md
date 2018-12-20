@@ -305,13 +305,22 @@ var tags = arrayToMap(data.data.tags);
   published_by: 1 }
  */
 //data.db[0].data.posts.forEach(function(post) {
-function convertToSlug(Text)
+function convertToSlug(text)
 {
-    return Text
+    return text
         .toLowerCase()
         .replace(/[^\w ]+/g,'')
         .replace(/ +/g,'-')
         ;
+}
+
+function escapeHtml(text) {
+  return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
 }
 
 /*function convertToSlug(text) {
@@ -343,7 +352,7 @@ for (var key in articles) {
   // });
 
   //post.title = post.title.indexOf(':') > 1 ? '"' + post.title + '"' : post.title;
-  post.title = post.name.indexOf(':') > 1 ? '"' + post.name + '"' : post.name;
+  post.title = '\"' + escapeHtml(post.name) + '\"';
 
   // Convert to ISO string.
   //post.publishedAt = new Date(post.published_at).toISOString();
@@ -354,7 +363,7 @@ for (var key in articles) {
   // Format the file name we're going to save.
   // Will be in the form of '2014-10-11-post-slug.md';
   //var fileName = post.formattedDate + '-' + post.slug + '.md';
-  var fileName = downcode(convertToSlug(post.title)) + '.md';
+  var fileName = downcode(convertToSlug(post.name)) + '.md';
 
   // If this entry is a page then rename the file name.
   // if (post.page) {

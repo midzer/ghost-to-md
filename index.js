@@ -69,9 +69,15 @@ var postTemplate = _.template(templateStr);
 function arrayToMap(array, mapKey) {
   var mapObj = {};
   mapKey = mapKey || 'id';
-  array.forEach(function(item) {
+  /*array.forEach(function(item) {
     mapObj[item[mapKey]] = item;
-  });
+  });*/
+  for (var key in array) {
+    if (array.hasOwnProperty(key)) {
+        mapObj[array[key][mapKey]] = array[key];
+    }
+}
+
   return mapObj;
 }
 
@@ -108,16 +114,25 @@ function formatDate(timeStr) {
    updated_at: 1388436339288,
    updated_by: 1 }
  */
-var settings = data.db[0].data.settings;
+//var settings = data.db[0].data.settings;
+var settings = data.data.settings;
 
 /**
  { id: 2, post_id: 3, tag_id: 360 }
  */
 var postsTags = {};
-data.db[0].data.posts_tags.forEach(function(item) {
+/*data.db[0].data.posts_tags.forEach(function(item) {
   postsTags[item.post_id] = postsTags[item.post_id] || [];
   postsTags[item.post_id].push(item.tag_id);
-});
+});*/
+var articles = data.data.articles;
+for (var key in articles) {
+    if (articles.hasOwnProperty(key)) {
+        //console.log(key + ": " + articles[key]);
+        postsTags[key] = postsTags[articles[key]] || [];
+        //postsTags[key].push(item.tag_id);
+    }
+}
 
 /**
  { id: 1,
@@ -135,7 +150,8 @@ data.db[0].data.posts_tags.forEach(function(item) {
    image: null,
    hidden: 0 }
  */
-var tags = arrayToMap(data.db[0].data.tags);
+//var tags = arrayToMap(data.db[0].data.tags);
+var tags = arrayToMap(data.data.tags);
 
 /**
  { id: 2,
@@ -159,34 +175,42 @@ var tags = arrayToMap(data.db[0].data.tags);
   published_at: 1263372815000,
   published_by: 1 }
  */
-data.db[0].data.posts.forEach(function(post) {
-  var postTags = postsTags[post.id] || [];
-  post.tags = [];
+//data.db[0].data.posts.forEach(function(post) {
+var articles = data.data.articles;
+for (var key in articles) {
+if (articles.hasOwnProperty(key)) {
+  var post = articles[key];
+        
+
+  //var postTags = postsTags[post.id] || [];
+  //post.tags = [];
 
   // Add each tag to the post.
-  postTags.forEach(function(tagId) {
-    var tag = tags[tagId];
-    if (tag) {
-      post.tags.push(tag.name);
-    }
-  });
+  // postTags.forEach(function(tagId) {
+  //   var tag = tags[tagId];
+  //   if (tag) {
+  //     post.tags.push(tag.name);
+  //   }
+  // });
 
-  post.title = post.title.indexOf(':') > 1 ? '"' + post.title + '"' : post.title;
+  //post.title = post.title.indexOf(':') > 1 ? '"' + post.title + '"' : post.title;
+  post.title = post.name.indexOf(':') > 1 ? '"' + post.name + '"' : post.name;
 
   // Convert to ISO string.
-  post.publishedAt = new Date(post.published_at).toISOString();
-  post.updatedAt = new Date(post.updated_at).toISOString();
+  //post.publishedAt = new Date(post.published_at).toISOString();
+  //post.updatedAt = new Date(post.updated_at).toISOString();
 
-  post.formattedDate = formatDate(post.published_at);
+  //post.formattedDate = formatDate(post.published_at);
 
   // Format the file name we're going to save.
   // Will be in the form of '2014-10-11-post-slug.md';
-  var fileName = post.formattedDate + '-' + post.slug + '.md';
+  //var fileName = post.formattedDate + '-' + post.slug + '.md';
+  var fileName = post.slug + '.md';
 
   // If this entry is a page then rename the file name.
-  if (post.page) {
-    fileName = 'page-' + post.slug + '.md';
-  }
+  // if (post.page) {
+  //   fileName = 'page-' + post.slug + '.md';
+  // }
 
   // File content.
   var fileContent = postTemplate({
@@ -198,4 +222,6 @@ data.db[0].data.posts.forEach(function(post) {
 
   // Write file.
   fs.writeFileSync(filePath, fileContent, {encoding: 'utf8'});
-});
+}
+//});
+}

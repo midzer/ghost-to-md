@@ -363,7 +363,9 @@ for (var key in articles) {
   // Format the file name we're going to save.
   // Will be in the form of '2014-10-11-post-slug.md';
   //var fileName = post.formattedDate + '-' + post.slug + '.md';
-  var fileName = downcode(convertToSlug(post.name)) + '.md';
+  var slug = downcode(convertToSlug(post.name));
+  post.url = '/' + slug + '/';
+  var fileName = slug + '.md';
 
   // If this entry is a page then rename the file name.
   // if (post.page) {

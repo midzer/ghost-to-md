@@ -337,8 +337,8 @@ function escapeHtml(text) {
 var articles = data.data.articles;
 for (var key in articles) {
   if (articles.hasOwnProperty(key)) {
-  var post = articles[key];
-
+  var article = articles[key];
+  var post = {};
 
   //var postTags = postsTags[post.id] || [];
   //post.tags = [];
@@ -352,8 +352,22 @@ for (var key in articles) {
   // });
 
   //post.title = post.title.indexOf(':') > 1 ? '"' + post.title + '"' : post.title;
-  post.title = '\"' + escapeHtml(post.name) + '\"';
+  post.title = '\"' + escapeHtml(article.name) + '\"';
+  post.body = article.body;
 
+  if (article.category) {
+    article.category = article.category.replace('categories ', '');
+    var categories = data.data.categories;
+    for (var key2 in categories) {
+      if (categories.hasOwnProperty(key2)) {
+        if (key2 === article.category) {
+          var category = categories[key2];
+          post.category = '\"' + category.name + '\"';
+          break;
+        }
+      }
+    }
+  }
   // Convert to ISO string.
   //post.publishedAt = new Date(post.published_at).toISOString();
   //post.updatedAt = new Date(post.updated_at).toISOString();
@@ -363,7 +377,7 @@ for (var key in articles) {
   // Format the file name we're going to save.
   // Will be in the form of '2014-10-11-post-slug.md';
   //var fileName = post.formattedDate + '-' + post.slug + '.md';
-  var slug = downcode(convertToSlug(post.name));
+  var slug = downcode(convertToSlug(article.name));
   post.url = '/' + slug + '/';
   var fileName = slug + '.md';
 

@@ -1,7 +1,7 @@
----
-title: ${post.title}
-slug: ${post.slug}<% if (post.category) { %>
-categories: ${post.category}<% } %>
----
++++<% if (post.category) { %>
+categories = ${post.category}<% } %>
+slug = ${post.slug}
+title = ${post.title}
++++
 
 ${post.body}

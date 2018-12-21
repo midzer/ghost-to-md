@@ -1,6 +1,6 @@
 ---
 title: ${post.title}
-url: ${post.url}<% if (post.category) { %>
+slug: ${post.slug}<% if (post.category) { %>
 categories: ${post.category}<% } %>
 ---
 

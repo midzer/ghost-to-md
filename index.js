@@ -371,7 +371,19 @@ for (var key in articles) {
   // Convert to ISO string.
   //post.publishedAt = new Date(post.published_at).toISOString();
   //post.updatedAt = new Date(post.updated_at).toISOString();
+  post.publishDate = '\"' + article.publish_date + '\"';
+  post.date = '\"' + article.create_date + '\"';
+  post.lastmod = '\"' + article.last_updated + '\"';
 
+  if (article.disclaimer) {
+    post.disclaimer = JSON.stringify(article.disclaimer);
+  }
+  if (article.preamble) {
+    post.preamble = JSON.stringify(article.preamble);
+  }
+  if (article.short_description) {
+    post.shortDescription = JSON.stringify(article.short_description);
+  }
   //post.formattedDate = formatDate(post.published_at);
 
   // Format the file name we're going to save.

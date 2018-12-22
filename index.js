@@ -147,8 +147,6 @@ function downcode(slug) {
         return Downcoder.map[m];
     });
 }
-
-
 // Get full path to output directory
 var outputDirectoryPath = path.resolve(argv.output);
 
@@ -158,7 +156,6 @@ try {
 } catch (e) {
   fs.mkdirSync(outputDirectoryPath);
 }
-
 // Try to read the export file from the file system and parse it as JSON data.
 try {
   var file = fs.readFileSync(path.resolve(argv._[0]), {encoding: 'utf8'});
@@ -166,7 +163,6 @@ try {
   console.error('Could not parse export file:', e.path);
   return 0;
 }
-
 // Replace all images
 file = file.replace(/\/webhook-uploads\//g, 'https://res.cloudinary.com/schmopera/image/upload/v1545409169/media/webhook-uploads/')
 var data = JSON.parse(file);
@@ -192,122 +188,6 @@ var templateStr = fs.readFileSync(templatePath, {encoding: 'utf8'});
  */
 var postTemplate = _.template(templateStr);
 
-/**
- * Converts an array to a map.
- * @param  {Array} array  Array object we're transforming.
- * @param  {string} mapKey The property we're using to get the key for the
- *  dictionary.
- * @return {Object} The transformed array.
- */
-function arrayToMap(array, mapKey) {
-  var mapObj = {};
-  mapKey = mapKey || 'id';
-  /*array.forEach(function(item) {
-    mapObj[item[mapKey]] = item;
-  });*/
-  for (var key in array) {
-    if (array.hasOwnProperty(key)) {
-        mapObj[array[key][mapKey]] = array[key];
-    }
-}
-
-  return mapObj;
-}
-
-/**
- * Given a time string or integer value we will format it into a human readable
- * string.
- * @param  {string|number} timeStr A time value, in the form of '1406827588763'.
- * @return {string}  Human readable string, such as '2014-10-08'.
- */
-/*function formatDate(timeStr) {
-  function ensure0Padding(val) {
-    return val < 10 ? '0' + val : val;
-  }
-
-  var publishedDate = new Date(timeStr);
-
-  var date = [
-    publishedDate.getFullYear(),
-    ensure0Padding(publishedDate.getMonth() + 1),
-    ensure0Padding(publishedDate.getDate())
-  ];
-
-  return date.join('-');
-}*/
-
-/**
- { id: 1,
-   uuid: '496e4476-6345-4b64-9779-7166cd957070',
-   key: 'databaseVersion',
-   value: '003',
-   type: 'core',
-   created_at: 1388436339288,
-   created_by: 1,
-   updated_at: 1388436339288,
-   updated_by: 1 }
- */
-//var settings = data.db[0].data.settings;
-//var settings = data.data.settings;
-
-/**
- { id: 2, post_id: 3, tag_id: 360 }
- */
-//var postsTags = {};
-/*data.db[0].data.posts_tags.forEach(function(item) {
-  postsTags[item.post_id] = postsTags[item.post_id] || [];
-  postsTags[item.post_id].push(item.tag_id);
-});*/
-/*var articles = data.data.articles;
-for (var key in articles) {
-    if (articles.hasOwnProperty(key)) {
-        postsTags[key] = postsTags[articles[key]] || [];
-        //postsTags[key].push(item.tag_id);
-    }
-}*/
-
-/**
- { id: 1,
-   uuid: '920afa0b-f8f1-4d55-a75d-e0470bfd300c',
-   name: 'Getting Started',
-   slug: 'getting-started',
-   description: null,
-   parent_id: null,
-   meta_title: null,
-   meta_description: null,
-   created_at: 1388436339245,
-   created_by: 1,
-   updated_at: 1388436339245,
-   updated_by: 1,
-   image: null,
-   hidden: 0 }
- */
-//var tags = arrayToMap(data.db[0].data.tags);
-//var tags = arrayToMap(data.data.tags);
-
-/**
- { id: 2,
-  uuid: '6a583a87-7f37-4b51-976a-cd6b5b809d56',
-  title: 'Hello world!',
-  slug: 'hello-world',
-  markdown: 'This is your first post.',
-  html: '<p>This is your first post.</p>',
-  image: null,
-  featured: 0,
-  page: 0,
-  status: 'published',
-  language: 'en_US',
-  meta_title: null,
-  meta_description: null,
-  author_id: 1,
-  created_at: 1263372815000,
-  created_by: 1,
-  updated_at: 1263372815000,
-  updated_by: 1,
-  published_at: 1263372815000,
-  published_by: 1 }
- */
-//data.db[0].data.posts.forEach(function(post) {
 function convertToSlug(text)
 {
     return text
@@ -326,117 +206,80 @@ function escapeHtml(text) {
       .replace(/'/g, "&#039;");
 }
 
-/*function convertToSlug(text) {
-  if (text.charAt(0) === '/') {
-    text = text.substr(1);
-  }
-  if (text.substr(-1) === '/') {
-    text = text.slice(0, -1);
-  }
-  text = text.replace(/\s+/g, '-');
-  text = downcode(text);
-  return text;
-}*/
 const articles = {...data.data.articles, ...data.data.videos};
 for (var key in articles) {
   if (articles.hasOwnProperty(key)) {
-  var article = articles[key];
-  var post = {};
+    var article = articles[key];
+    var post = {};
 
-  //var postTags = postsTags[post.id] || [];
-  //post.tags = [];
+    post.title = JSON.stringify(escapeHtml(article.name));
+    post.body = article.body;
 
-  // Add each tag to the post.
-  // postTags.forEach(function(tagId) {
-  //   var tag = tags[tagId];
-  //   if (tag) {
-  //     post.tags.push(tag.name);
-  //   }
-  // });
-
-  //post.title = post.title.indexOf(':') > 1 ? '"' + post.title + '"' : post.title;
-  post.title = JSON.stringify(escapeHtml(article.name));
-  post.body = article.body;
-
-  if (article.category) {
-    article.category = article.category.replace('categories ', '');
-    var categories = data.data.categories;
-    for (var key2 in categories) {
-      if (categories.hasOwnProperty(key2)) {
-        if (key2 === article.category) {
-          var category = categories[key2];
-          post.category = JSON.stringify(category.name);
-          break;
+    if (article.category) {
+      article.category = article.category.replace('categories ', '');
+      var categories = data.data.categories;
+      for (var key2 in categories) {
+        if (categories.hasOwnProperty(key2)) {
+          if (key2 === article.category) {
+            var category = categories[key2];
+            post.category = JSON.stringify(category.name);
+            break;
+          }
         }
       }
     }
-  }
-  if (article.youtube_url) {
-    post.youtube = JSON.stringify(article.youtube_url.original_url);
-  }
-  // Convert to ISO string.
-  //post.publishedAt = new Date(post.published_at).toISOString();
-  //post.updatedAt = new Date(post.updated_at).toISOString();
-  if (article.publish_date) {
-    post.publishDate = JSON.stringify(article.publish_date);
-  }
-  else {
-    // some articles might not have been published, so mark them as drafts
-    post.draft = 'true'; 
-  }
-  if (article.create_date) {
-    post.date = JSON.stringify(article.create_date);
-  }
-  else {
-    // some articles might not have been published, so mark them as drafts
-    post.draft = 'true'; 
-  }
-  if (article.last_updated) {
-    post.lastmod = JSON.stringify(article.last_updated);
-  }
-  else {
-    // some articles might not have been published, so mark them as drafts
-    post.draft = 'true'; 
-  }
-  if (article.disclaimer) {
-    post.disclaimer = JSON.stringify(article.disclaimer);
-  }
-  if (article.preamble) {
-    post.preamble = JSON.stringify(article.preamble);
-  }
-  if (article.short_description) {
-    post.shortDescription = JSON.stringify(escapeHtml(article.short_description));
-  }
-  //post.formattedDate = formatDate(post.published_at);
+    if (article.youtube_url) {
+      post.youtube = JSON.stringify(article.youtube_url.original_url);
+    }
+    if (article.publish_date) {
+      post.publishDate = JSON.stringify(article.publish_date);
+    }
+    else {
+      // some articles might not have been published, so mark them as drafts
+      post.draft = 'true'; 
+    }
+    if (article.create_date) {
+      post.date = JSON.stringify(article.create_date);
+    }
+    else {
+      // some articles might not have been published, so mark them as drafts
+      post.draft = 'true'; 
+    }
+    if (article.last_updated) {
+      post.lastmod = JSON.stringify(article.last_updated);
+    }
+    else {
+      // some articles might not have been published, so mark them as drafts
+      post.draft = 'true'; 
+    }
+    if (article.disclaimer) {
+      post.disclaimer = JSON.stringify(article.disclaimer);
+    }
+    if (article.preamble) {
+      post.preamble = JSON.stringify(article.preamble);
+    }
+    if (article.short_description) {
+      post.shortDescription = JSON.stringify(escapeHtml(article.short_description));
+    }
+    var slug;
+    if (article.slug) {
+      slug = article.slug;
+    }
+    else {
+      slug = downcode(convertToSlug(article.name));
+    }
+    post.slug = JSON.stringify(slug);
+    var fileName = slug + '.md';
 
-  // Format the file name we're going to save.
-  // Will be in the form of '2014-10-11-post-slug.md';
-  //var fileName = post.formattedDate + '-' + post.slug + '.md';
-  var slug;
-  if (article.slug) {
-    slug = article.slug;
+    // File content.
+    var fileContent = postTemplate({
+      post: post
+    });
+
+    // Get full path to the file we're going to write.
+    var filePath = path.resolve(outputDirectoryPath, fileName);
+
+    // Write file.
+    fs.writeFileSync(filePath, fileContent, {encoding: 'utf8'});
   }
-  else {
-    slug = downcode(convertToSlug(article.name));
-  }
-  post.slug = JSON.stringify(slug);
-  var fileName = slug + '.md';
-
-  // If this entry is a page then rename the file name.
-  // if (post.page) {
-  //   fileName = 'page-' + post.slug + '.md';
-  // }
-
-  // File content.
-  var fileContent = postTemplate({
-    post: post
-  });
-
-  // Get full path to the file we're going to write.
-  var filePath = path.resolve(outputDirectoryPath, fileName);
-
-  // Write file.
-  fs.writeFileSync(filePath, fileContent, {encoding: 'utf8'});
-}
-//});
 }

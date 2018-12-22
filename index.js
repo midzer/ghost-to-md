@@ -161,11 +161,15 @@ try {
 
 // Try to read the export file from the file system and parse it as JSON data.
 try {
-  var data = JSON.parse(fs.readFileSync(path.resolve(argv._[0]), {encoding: 'utf8'}));
+  var file = fs.readFileSync(path.resolve(argv._[0]), {encoding: 'utf8'});
 } catch (e) {
   console.error('Could not parse export file:', e.path);
   return 0;
 }
+
+// Replace all images
+file = file.replace(/\/webhook-uploads\//g, 'https://res.cloudinary.com/schmopera/image/upload/v1545409169/media/webhook-uploads/')
+var data = JSON.parse(file);
 
 /**
  * The path to the template file.  If it's given as an argument than its

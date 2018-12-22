@@ -205,7 +205,12 @@ function escapeHtml(text) {
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
 }
-
+// Articles + Videos
+try {
+  fs.readdirSync(outputDirectoryPath + '/articles');
+} catch (e) {
+  fs.mkdirSync(outputDirectoryPath + '/articles');
+}
 const articles = {...data.data.articles, ...data.data.videos};
 for (var key in articles) {
   if (articles.hasOwnProperty(key)) {
@@ -277,7 +282,86 @@ for (var key in articles) {
     });
 
     // Get full path to the file we're going to write.
-    var filePath = path.resolve(outputDirectoryPath, fileName);
+    var filePath = path.resolve(outputDirectoryPath + '/articles', fileName);
+
+    // Write file.
+    fs.writeFileSync(filePath, fileContent, {encoding: 'utf8'});
+  }
+}
+// Authors
+try {
+  fs.readdirSync(outputDirectoryPath + '/authors');
+} catch (e) {
+  fs.mkdirSync(outputDirectoryPath + '/authors');
+}
+const authors = data.data.authors;
+for (var key in authors) {
+  if (authors.hasOwnProperty(key)) {
+    var author = authors[key];
+    var post = {};
+
+    post.name = JSON.stringify(escapeHtml(author.name));
+    post.body = author.long_bio;
+
+    if (author.photo) {
+      post.primaryImage = JSON.stringify(author.photo.url);
+    }
+    if (author.email) {
+      post.email = JSON.stringify(author.email);
+    }
+    if (author.facebook) {
+      post.facebook = JSON.stringify(author.facebook);
+    }
+    if (author.twitter) {
+      post.twitter = JSON.stringify(author.twitter);
+    }
+    if (author.website) {
+      post.website = JSON.stringify(author.website);
+    }
+    if (author.publish_date) {
+      post.publishDate = JSON.stringify(author.publish_date);
+    }
+    else {
+      // some articles might not have been published, so mark them as drafts
+      post.draft = 'true'; 
+    }
+    if (author.create_date) {
+      post.date = JSON.stringify(author.create_date);
+    }
+    else {
+      // some articles might not have been published, so mark them as drafts
+      post.draft = 'true'; 
+    }
+    if (author.last_updated) {
+      post.lastmod = JSON.stringify(author.last_updated);
+    }
+    else {
+      // some articles might not have been published, so mark them as drafts
+      post.draft = 'true'; 
+    }
+    if (author.short_bio) {
+      post.shortBio = JSON.stringify(escapeHtml(author.short_bio));
+    }
+    var slug;
+    if (author.slug) {
+      slug = author.slug;
+      
+      // Clean slug for some cases
+      slug = slug.replace('authors/', '');
+    }
+    else {
+      slug = downcode(convertToSlug(author.name));
+    }
+    post.slug = JSON.stringify(slug);
+    var fileName = slug + '.md';
+
+    // File content.
+    var fileContent = postTemplate({
+      post: post
+    });
+
+    // Get full path to the file we're going to write.
+    var filePath = path.resolve(outputDirectoryPath + '/authors', fileName);
 
     // Write file.
     fs.writeFileSync(filePath, fileContent, {encoding: 'utf8'});

@@ -220,7 +220,7 @@ function arrayToMap(array, mapKey) {
  * @param  {string|number} timeStr A time value, in the form of '1406827588763'.
  * @return {string}  Human readable string, such as '2014-10-08'.
  */
-function formatDate(timeStr) {
+/*function formatDate(timeStr) {
   function ensure0Padding(val) {
     return val < 10 ? '0' + val : val;
   }
@@ -234,7 +234,7 @@ function formatDate(timeStr) {
   ];
 
   return date.join('-');
-}
+}*/
 
 /**
  { id: 1,
@@ -248,24 +248,23 @@ function formatDate(timeStr) {
    updated_by: 1 }
  */
 //var settings = data.db[0].data.settings;
-var settings = data.data.settings;
+//var settings = data.data.settings;
 
 /**
  { id: 2, post_id: 3, tag_id: 360 }
  */
-var postsTags = {};
+//var postsTags = {};
 /*data.db[0].data.posts_tags.forEach(function(item) {
   postsTags[item.post_id] = postsTags[item.post_id] || [];
   postsTags[item.post_id].push(item.tag_id);
 });*/
-var articles = data.data.articles;
+/*var articles = data.data.articles;
 for (var key in articles) {
     if (articles.hasOwnProperty(key)) {
-        //console.log(key + ": " + articles[key]);
         postsTags[key] = postsTags[articles[key]] || [];
         //postsTags[key].push(item.tag_id);
     }
-}
+}*/
 
 /**
  { id: 1,
@@ -284,7 +283,7 @@ for (var key in articles) {
    hidden: 0 }
  */
 //var tags = arrayToMap(data.db[0].data.tags);
-var tags = arrayToMap(data.data.tags);
+//var tags = arrayToMap(data.data.tags);
 
 /**
  { id: 2,
@@ -338,7 +337,7 @@ function escapeHtml(text) {
   text = downcode(text);
   return text;
 }*/
-var articles = data.data.articles;
+const articles = {...data.data.articles, ...data.data.videos};
 for (var key in articles) {
   if (articles.hasOwnProperty(key)) {
   var article = articles[key];
@@ -356,7 +355,7 @@ for (var key in articles) {
   // });
 
   //post.title = post.title.indexOf(':') > 1 ? '"' + post.title + '"' : post.title;
-  post.title = '\"' + escapeHtml(article.name) + '\"';
+  post.title = JSON.stringify(escapeHtml(article.name));
   post.body = article.body;
 
   if (article.category) {
@@ -366,19 +365,39 @@ for (var key in articles) {
       if (categories.hasOwnProperty(key2)) {
         if (key2 === article.category) {
           var category = categories[key2];
-          post.category = '\"' + category.name + '\"';
+          post.category = JSON.stringify(category.name);
           break;
         }
       }
     }
   }
+  if (article.youtube_url) {
+    post.youtube = JSON.stringify(article.youtube_url.original_url);
+  }
   // Convert to ISO string.
   //post.publishedAt = new Date(post.published_at).toISOString();
   //post.updatedAt = new Date(post.updated_at).toISOString();
-  post.publishDate = '\"' + article.publish_date + '\"';
-  post.date = '\"' + article.create_date + '\"';
-  post.lastmod = '\"' + article.last_updated + '\"';
-
+  if (article.publish_date) {
+    post.publishDate = JSON.stringify(article.publish_date);
+  }
+  else {
+    // some articles might not have been published, so mark them as drafts
+    post.draft = 'true'; 
+  }
+  if (article.create_date) {
+    post.date = JSON.stringify(article.create_date);
+  }
+  else {
+    // some articles might not have been published, so mark them as drafts
+    post.draft = 'true'; 
+  }
+  if (article.last_updated) {
+    post.lastmod = JSON.stringify(article.last_updated);
+  }
+  else {
+    // some articles might not have been published, so mark them as drafts
+    post.draft = 'true'; 
+  }
   if (article.disclaimer) {
     post.disclaimer = JSON.stringify(article.disclaimer);
   }
@@ -386,7 +405,7 @@ for (var key in articles) {
     post.preamble = JSON.stringify(article.preamble);
   }
   if (article.short_description) {
-    post.shortDescription = JSON.stringify(article.short_description);
+    post.shortDescription = JSON.stringify(escapeHtml(article.short_description));
   }
   //post.formattedDate = formatDate(post.published_at);
 

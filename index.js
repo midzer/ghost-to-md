@@ -220,6 +220,10 @@ for (var key in articles) {
     post.title = JSON.stringify(escapeHtml(article.name));
     post.body = article.body;
 
+    if (article.primary_image) {
+      post.primaryImage = JSON.stringify(article.primary_image.url);
+    }
+
     if (article.category) {
       article.category = article.category.replace('categories ', '');
       var categories = data.data.categories;

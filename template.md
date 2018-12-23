@@ -1,11 +1,14 @@
-+++<% if (post.category) { %>
-categories = ${post.category}<% } %><% if (post.date) { %>
++++<% if (post.author) { %>
+author = ${post.author}<% } %><% if (post.category) { %>
+categories = ${post.category}<% } %><% if (post.companies) { %>
+companies = ${post.companies}<% } %><% if (post.date) { %>
 date = ${post.date}<% } %><% if (post.disclaimer) { %>
 disclaimer = ${post.disclaimer}<% } %><% if (post.draft) { %>
 draft = ${post.draft}<% } %><% if (post.email) { %>
 email = ${post.email}<% } %><% if (post.facebook) { %>
 facebook = ${post.facebook}<% } %><% if (post.lastmod) { %>
-lastmod = ${post.lastmod}<% } %><% if (post.preamble) { %>
+lastmod = ${post.lastmod}<% } %><% if (post.people) { %>
+people = ${post.people}<% } %><% if (post.preamble) { %>
 preamble = ${post.preamble}<% } %><% if (post.primaryImage) { %>
 primary_image = ${post.primaryImage}<% } %><% if (post.publishDate) { %>
 publishDate = ${post.publishDate}<% } %><% if (post.shortDescription) { %>

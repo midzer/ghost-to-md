@@ -223,7 +223,51 @@ for (var key in articles) {
     if (article.primary_image) {
       post.primaryImage = JSON.stringify(article.primary_image.url);
     }
-
+    if (article.authors) {
+      article.author = article.authors[0].replace('authors ', '');
+      let authors = data.data.authors;
+      for (var key2 in authors) {
+        if (authors.hasOwnProperty(key2)) {
+          if (key2 === article.author) {
+            var author = authors[key2];
+            post.author = JSON.stringify(author.name);
+            break;
+          }
+        }
+      }
+    }
+    if (article.companies) {
+      let companies = data.data.companies;
+      post.companies = [];
+      article.companies.forEach(function(company) {
+        company = company.replace('companies ', '');
+        for (var key2 in companies) {
+          if (companies.hasOwnProperty(key2)) {
+            if (key2 === company) {
+              post.companies.push(JSON.stringify(companies[key2].name));
+              break;
+            }
+          }
+        }
+      });
+      post.companies = "[" + post.companies + "]";
+    }
+    if (article.people) {
+      let people = data.data.people;
+      post.people = [];
+      article.people.forEach(function(person) {
+        person = person.replace('people ', '');
+        for (var key2 in people) {
+          if (people.hasOwnProperty(key2)) {
+            if (key2 === person) {
+              post.people.push(JSON.stringify(people[key2].name));
+              break;
+            }
+          }
+        }
+      });
+      post.people = "[" + post.people + "]";
+    }
     if (article.category) {
       article.category = article.category.replace('categories ', '');
       var categories = data.data.categories;

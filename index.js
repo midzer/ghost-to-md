@@ -300,7 +300,7 @@ for (var key in authors) {
     var author = authors[key];
     var post = {};
 
-    post.name = JSON.stringify(escapeHtml(author.name));
+    post.title = JSON.stringify(escapeHtml(author.name));
     post.body = author.long_bio;
 
     if (author.photo) {

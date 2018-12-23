@@ -206,6 +206,16 @@ function escapeHtml(text) {
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
 }
+function getSlug(field) {
+  var slug;
+  if (field.slug) {
+    slug = field.slug;
+  }
+  else {
+    slug = downcode(convertToSlug(field.name));
+  }
+  return slug;
+}
 // Articles + Videos
 try {
   fs.readdirSync(outputDirectoryPath + '/articles');
@@ -228,49 +238,60 @@ for (var key in articles) {
       post.primaryImageCredit = JSON.stringify(article.primary_image_credit);
     }
     if (article.authors) {
-      article.author = article.authors[0].replace('authors ', '');
-      let authors = data.data.authors;
-      for (var key2 in authors) {
-        if (authors.hasOwnProperty(key2)) {
-          if (key2 === article.author) {
-            var author = authors[key2];
-            post.author = JSON.stringify(author.name);
-            break;
+      post.author = [];
+      article.authors.forEach(function(author) {
+        if (author.includes('authors ')) {
+          author = author.replace('authors ', '');
+          let authors = data.data.authors;
+          for (var key2 in authors) {
+            if (authors.hasOwnProperty(key2)) {
+              if (key2 === author) {
+                let slug = getSlug(authors[key2]);
+                slug = slug.replace('authors/', ''); // Clean slug for some cases
+                post.author.push(JSON.stringify("authors/" + slug + ".md"));
+                break;
+              }
+            }
           }
         }
-      }
+      });
+      post.author = "[" + post.author + "]";
     }
     if (article.companies) {
       let companies = data.data.companies;
-      post.companies = [];
+      post.relatedCompanies = [];
       article.companies.forEach(function(company) {
         company = company.replace('companies ', '');
         for (var key2 in companies) {
           if (companies.hasOwnProperty(key2)) {
             if (key2 === company) {
-              post.companies.push(JSON.stringify(companies[key2].name));
+              let slug = getSlug(companies[key2]);
+              slug = slug.replace('companies/', ''); // Clean slug for some cases
+              post.relatedCompanies.push(JSON.stringify("scene/companies/" + slug + ".md"));
               break;
             }
           }
         }
       });
-      post.companies = "[" + post.companies + "]";
+      post.relatedCompanies = "[" + post.relatedCompanies + "]";
     }
     if (article.people) {
       let people = data.data.people;
-      post.people = [];
+      post.relatedPeople = [];
       article.people.forEach(function(person) {
         person = person.replace('people ', '');
         for (var key2 in people) {
           if (people.hasOwnProperty(key2)) {
             if (key2 === person) {
-              post.people.push(JSON.stringify(people[key2].name));
+              let slug = getSlug(people[key2]);
+              slug = slug.replace('people/', ''); // Clean slug for some cases
+              post.relatedPeople.push(JSON.stringify("scene/people/" + slug + ".md"));
               break;
             }
           }
         }
       });
-      post.people = "[" + post.people + "]";
+      post.relatedPeople = "[" + post.relatedPeople + "]";
     }
     if (article.category) {
       article.category = article.category.replace('categories ', '');
@@ -284,6 +305,32 @@ for (var key in articles) {
           }
         }
       }
+    }
+    if (article.related_videos) {
+      if (article.related_articles) {
+        article.related_articles = article.related_articles.concat(article.related_videos);
+      }
+      else {
+        article.related_articles = article.related_videos;
+      }
+    }
+    if (article.related_articles) {
+      post.relatedArticles = []; 
+      article.related_articles.forEach(function(article) {
+        article = article.replace('articles ', '');
+        article = article.replace('videos ', '');
+        let articles = data.data.articles;
+        for (var key2 in articles) {
+          if (articles.hasOwnProperty(key2)) {
+            if (key2 === article) {
+              let slug = getSlug(articles[key2]);
+              post.relatedArticles.push(JSON.stringify("articles/" + slug + ".md"));
+              break;
+            }
+          }
+        }
+      });
+      post.relatedArticles = "[" + post.relatedArticles + "]";
     }
     if (article.youtube_url) {
       post.youtube = JSON.stringify(article.youtube_url.original_url);
@@ -318,13 +365,7 @@ for (var key in articles) {
     if (article.short_description) {
       post.shortDescription = JSON.stringify(escapeHtml(article.short_description));
     }
-    var slug;
-    if (article.slug) {
-      slug = article.slug;
-    }
-    else {
-      slug = downcode(convertToSlug(article.name));
-    }
+    let slug = getSlug(article);
     post.slug = JSON.stringify(slug);
     var fileName = slug + '.md';
 
@@ -397,16 +438,8 @@ for (var key in authors) {
     if (author.short_bio) {
       post.shortBio = JSON.stringify(escapeHtml(author.short_bio));
     }
-    var slug;
-    if (author.slug) {
-      slug = author.slug;
-      
-      // Clean slug for some cases
-      slug = slug.replace('authors/', '');
-    }
-    else {
-      slug = downcode(convertToSlug(author.name));
-    }
+    let slug = getSlug(author);
+    slug = slug.replace('authors/', ''); // Clean slug for some cases
     post.slug = JSON.stringify(slug);
     var fileName = slug + '.md';
 
@@ -504,16 +537,8 @@ for (var key in companies) {
       // some articles might not have been published, so mark them as drafts
       post.draft = 'true'; 
     }
-    var slug;
-    if (company.slug) {
-      slug = company.slug;
-
-      // Clean slug for some cases
-      slug = slug.replace('scene/companies/', '');
-    }
-    else {
-      slug = downcode(convertToSlug(company.name));
-    }
+    let slug = getSlug(company);
+    slug = slug.replace('scene/companies/', ''); // Clean slug for some cases
     post.slug = JSON.stringify(slug);
     var fileName = slug + '.md';
 
@@ -606,16 +631,8 @@ for (var key in people) {
       // some articles might not have been published, so mark them as drafts
       post.draft = 'true'; 
     }
-    var slug;
-    if (person.slug) {
-      slug = person.slug;
-
-      // Clean slug for some cases
-      slug = slug.replace('scene/people/', '');
-    }
-    else {
-      slug = downcode(convertToSlug(person.name));
-    }
+    let slug = getSlug(person);
+    slug = slug.replace('scene/people/', ''); // Clean slug for some cases
     post.slug = JSON.stringify(slug);
     var fileName = slug + '.md';
 

@@ -164,7 +164,8 @@ try {
   return 0;
 }
 // Replace all images
-file = file.replace(/\/webhook-uploads\//g, 'https://res.cloudinary.com/schmopera/image/upload/v1545409169/media/webhook-uploads/')
+file = file.replace(/\/webhook-uploads\//g, 'https://res.cloudinary.com/schmopera/image/upload/v1545409169/media/webhook-uploads/');
+file = file.replace(/.jpg"/g, '.jpg.jpg\"');
 var data = JSON.parse(file);
 
 /**
@@ -222,6 +223,9 @@ for (var key in articles) {
 
     if (article.primary_image) {
       post.primaryImage = JSON.stringify(article.primary_image.url);
+    }
+    if (article.primary_image_credit) {
+      post.primaryImageCredit = JSON.stringify(article.primary_image_credit);
     }
     if (article.authors) {
       article.author = article.authors[0].replace('authors ', '');
@@ -354,6 +358,9 @@ for (var key in authors) {
     if (author.photo) {
       post.primaryImage = JSON.stringify(author.photo.url);
     }
+    if (author.primary_image_credit) {
+      post.primaryImageCredit = JSON.stringify(author.primary_image_credit);
+    }
     if (author.email) {
       post.email = JSON.stringify(author.email);
     }
@@ -410,6 +417,215 @@ for (var key in authors) {
 
     // Get full path to the file we're going to write.
     var filePath = path.resolve(outputDirectoryPath + '/authors', fileName);
+
+    // Write file.
+    fs.writeFileSync(filePath, fileContent, {encoding: 'utf8'});
+  }
+}
+// Companies
+try {
+  fs.readdirSync(outputDirectoryPath + '/scene');
+} catch (e) {
+  fs.mkdirSync(outputDirectoryPath + '/scene');
+}
+try {
+  fs.readdirSync(outputDirectoryPath + '/scene/companies');
+} catch (e) {
+  fs.mkdirSync(outputDirectoryPath + '/scene/companies');
+}
+const companies = data.data.companies;
+for (var key in companies) {
+  if (companies.hasOwnProperty(key)) {
+    var company = companies[key];
+    var post = {};
+
+    post.title = JSON.stringify(escapeHtml(company.name));
+    post.body = company.description;
+
+    if (company.photo) {
+      post.primaryImage = JSON.stringify(company.photo.url);
+    }
+    if (company.primary_image_credit) {
+      post.primaryImageCredit = JSON.stringify(company.primary_image_credit);
+    }
+    if (company.email) {
+      post.email = JSON.stringify(company.email);
+    }
+    if (company.type_of_company) {
+      post.type_of_company = JSON.stringify(company.type_of_company);
+    }
+    if (company.social_media) {
+      let socialMedia = company.social_media;
+      socialMedia.forEach(function(media) {
+        let url = JSON.stringify(media.url);
+        switch (media.platform) {
+          case 'Facebook':
+          post.facebook = url;
+          break;
+          case 'Twitter':
+          post.twitter = url;
+          break;
+          case 'Instagram':
+          post.instagram = url;
+          break;
+          case 'Youtube':
+          post.youtube = url;
+          break;
+          case 'Linkedin':
+          post.linkedin = url;
+          break;
+          case 'Soundcloud':
+          post.soundcloud = url;
+          break;
+        }
+      });
+    }
+    if (company.website_url) {
+      post.website = JSON.stringify(company.website_url);
+    }
+    if (company.publish_date) {
+      post.publishDate = JSON.stringify(company.publish_date);
+    }
+    else {
+      // some articles might not have been published, so mark them as drafts
+      post.draft = 'true'; 
+    }
+    if (company.create_date) {
+      post.date = JSON.stringify(company.create_date);
+    }
+    else {
+      // some articles might not have been published, so mark them as drafts
+      post.draft = 'true'; 
+    }
+    if (company.last_updated) {
+      post.lastmod = JSON.stringify(company.last_updated);
+    }
+    else {
+      // some articles might not have been published, so mark them as drafts
+      post.draft = 'true'; 
+    }
+    var slug;
+    if (company.slug) {
+      slug = company.slug;
+
+      // Clean slug for some cases
+      slug = slug.replace('scene/companies/', '');
+    }
+    else {
+      slug = downcode(convertToSlug(company.name));
+    }
+    post.slug = JSON.stringify(slug);
+    var fileName = slug + '.md';
+
+    // File content.
+    var fileContent = postTemplate({
+      post: post
+    });
+
+    // Get full path to the file we're going to write.
+    var filePath = path.resolve(outputDirectoryPath + '/scene/companies', fileName);
+
+    // Write file.
+    fs.writeFileSync(filePath, fileContent, {encoding: 'utf8'});
+  }
+}
+// People
+try {
+  fs.readdirSync(outputDirectoryPath + '/scene/people');
+} catch (e) {
+  fs.mkdirSync(outputDirectoryPath + '/scene/people');
+}
+const people = data.data.people;
+for (var key in people) {
+  if (people.hasOwnProperty(key)) {
+    var person = people[key];
+    var post = {};
+
+    post.title = JSON.stringify(escapeHtml(person.name));
+    post.body = person.biography;
+
+    if (person.headshot) {
+      post.primaryImage = JSON.stringify(person.headshot.url);
+    }
+    if (person.headshot_credit) {
+      post.primaryImageCredit = JSON.stringify(person.headshot_credit);
+    }
+    if (person.email) {
+      post.email = JSON.stringify(person.email);
+    }
+    if (person.discipline) {
+      post.discipline = JSON.stringify(person.discipline);
+    }
+    if (person.social_media) {
+      let socialMedia = person.social_media;
+      socialMedia.forEach(function(media) {
+        let url = JSON.stringify(media.url);
+        switch (media.platform) {
+          case 'Facebook':
+          post.facebook = url;
+          break;
+          case 'Twitter':
+          post.twitter = url;
+          break;
+          case 'Instagram':
+          post.instagram = url;
+          break;
+          case 'Youtube':
+          post.youtube = url;
+          break;
+          case 'Linkedin':
+          post.linkedin = url;
+          break;
+          case 'Soundcloud':
+          post.soundcloud = url;
+          break;
+        }
+      });
+    }
+    if (person.website_url) {
+      post.website = JSON.stringify(person.website_url);
+    }
+    if (person.publish_date) {
+      post.publishDate = JSON.stringify(person.publish_date);
+    }
+    else {
+      // some articles might not have been published, so mark them as drafts
+      post.draft = 'true'; 
+    }
+    if (person.create_date) {
+      post.date = JSON.stringify(person.create_date);
+    }
+    else {
+      // some articles might not have been published, so mark them as drafts
+      post.draft = 'true'; 
+    }
+    if (person.last_updated) {
+      post.lastmod = JSON.stringify(person.last_updated);
+    }
+    else {
+      // some articles might not have been published, so mark them as drafts
+      post.draft = 'true'; 
+    }
+    var slug;
+    if (person.slug) {
+      slug = person.slug;
+
+      // Clean slug for some cases
+      slug = slug.replace('scene/people/', '');
+    }
+    else {
+      slug = downcode(convertToSlug(person.name));
+    }
+    post.slug = JSON.stringify(slug);
+    var fileName = slug + '.md';
+
+    // File content.
+    var fileContent = postTemplate({
+      post: post
+    });
+
+    // Get full path to the file we're going to write.
+    var filePath = path.resolve(outputDirectoryPath + '/scene/people', fileName);
 
     // Write file.
     fs.writeFileSync(filePath, fileContent, {encoding: 'utf8'});

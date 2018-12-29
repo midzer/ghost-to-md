@@ -267,6 +267,7 @@ for (var key in articles) {
             if (key2 === company) {
               let slug = getSlug(companies[key2]);
               slug = slug.replace('companies/', ''); // Clean slug for some cases
+              slug = slug.replace('scene/', ''); // Clean slug for some cases
               post.relatedCompanies.push(JSON.stringify("scene/companies/" + slug + ".md"));
               break;
             }
@@ -285,6 +286,7 @@ for (var key in articles) {
             if (key2 === person) {
               let slug = getSlug(people[key2]);
               slug = slug.replace('people/', ''); // Clean slug for some cases
+              slug = slug.replace('scene/', ''); // Clean slug for some cases
               post.relatedPeople.push(JSON.stringify("scene/people/" + slug + ".md"));
               break;
             }
@@ -513,6 +515,25 @@ for (var key in companies) {
         }
       });
     }
+    if (company.related_artists) {
+      let people = data.data.people;
+      post.relatedPeople = [];
+      company.related_artists.forEach(function(person) {
+        person = person.replace('people ', '');
+        for (var key2 in people) {
+          if (people.hasOwnProperty(key2)) {
+            if (key2 === person) {
+              let slug = getSlug(people[key2]);
+              slug = slug.replace('people/', ''); // Clean slug for some cases
+              slug = slug.replace('scene/', ''); // Clean slug for some cases
+              post.relatedPeople.push(JSON.stringify("scene/people/" + slug + ".md"));
+              break;
+            }
+          }
+        }
+      });
+      post.relatedPeople = "[" + post.relatedPeople + "]";
+    }
     if (company.website_url) {
       post.website = JSON.stringify(company.website_url);
     }
@@ -606,6 +627,25 @@ for (var key in people) {
           break;
         }
       });
+    }
+    if (person.related_companies) {
+      let companies = data.data.companies;
+      post.relatedCompanies = [];
+      person.related_companies.forEach(function(company) {
+        company = company.replace('companies ', '');
+        for (var key2 in companies) {
+          if (companies.hasOwnProperty(key2)) {
+            if (key2 === company) {
+              let slug = getSlug(companies[key2]);
+              slug = slug.replace('companies/', ''); // Clean slug for some cases
+              slug = slug.replace('scene/', ''); // Clean slug for some cases
+              post.relatedCompanies.push(JSON.stringify("scene/companies/" + slug + ".md"));
+              break;
+            }
+          }
+        }
+      });
+      post.relatedCompanies = "[" + post.relatedCompanies + "]";
     }
     if (person.website_url) {
       post.website = JSON.stringify(person.website_url);
